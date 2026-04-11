@@ -159,10 +159,15 @@ class NetWatchApp:
         self._event_log = scrolledtext.ScrolledText(
             frame, font=("Menlo", 11), bg=BG, fg=TEXT_SEC,
             insertbackground=TEXT_PRI, relief=tk.FLAT,
-            wrap=tk.WORD, state=tk.DISABLED,
-            padx=12, pady=8,
+            wrap=tk.WORD, padx=12, pady=8,
         )
         self._event_log.pack(fill=tk.BOTH, expand=True)
+
+        # Keep NORMAL state so macOS respects bg color; block user editing via bindings
+        self._event_log.bind("<Key>", lambda e: "break")
+        self._event_log.bind("<BackSpace>", lambda e: "break")
+        self._event_log.bind("<Delete>", lambda e: "break")
+        self._event_log.configure(cursor="arrow")
 
         for level, color in LOG_COLORS.items():
             self._event_log.tag_configure(level, foreground=color)
@@ -322,22 +327,23 @@ class NetWatchApp:
 
     def _poll_log_queue(self):
         """Drain the log queue and write to the Events text widget."""
+        import queue as _queue
         try:
             while True:
                 event = self.log.ui_queue.get_nowait()
                 self._append_event(event)
-        except Exception:
+        except _queue.Empty:
             pass
+        except Exception as e:
+            print(f"[NetWatch] poll error: {e}", flush=True)
         self.root.after(200, self._poll_log_queue)
 
     def _append_event(self, event: dict):
-        self._event_log.config(state=tk.NORMAL)
         self._event_log.insert(tk.END, f"{event['timestamp']} ", "TIMESTAMP")
         level_tag = event.get("level", "INFO")
         self._event_log.insert(tk.END,
                                f"[{level_tag:<7}] {event['message']}\n", level_tag)
         self._event_log.see(tk.END)
-        self._event_log.config(state=tk.DISABLED)
 
     # ── Diagnostics ──────────────────────────────────────────────────────────
 
