@@ -8,7 +8,7 @@ echo "→ Generating icon..."
 python3 make_icon.py
 
 echo "→ Building NetWatch.app (arm64)..."
-pyinstaller \
+python3 -m PyInstaller \
   --windowed \
   --name "NetWatch" \
   --icon "assets/icon.icns" \
