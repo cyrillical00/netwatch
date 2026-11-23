@@ -17,6 +17,7 @@ automated fixes — so you don't have to.
 brew tap cyrillical00/netwatch
 brew install --cask netwatch
 ```
+The cask verifies the release zip against a pinned SHA-256. The app is not yet code-signed or notarized, so macOS Gatekeeper will warn on first launch.
 
 ## What It Does
 

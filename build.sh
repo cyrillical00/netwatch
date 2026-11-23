@@ -28,3 +28,5 @@ echo ""
 cd dist
 zip -r NetWatch-macOS-arm64.zip NetWatch.app
 echo "✓ Release archive: dist/NetWatch-macOS-arm64.zip"
+shasum -a 256 NetWatch-macOS-arm64.zip
+echo "  ^ put this SHA-256 in Formula/netwatch.rb before publishing the release"
